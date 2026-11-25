@@ -1,0 +1,32 @@
+# Secrets & credentials (NEVER commit these to GitHub!)
+.env
+credentials.json
+token.json
+*.pem
+*.key
+
+# Generated outputs & local CRM database
+output/
+*.db
+*.db-wal
+*.db-shm
+
+# Python artifacts
+__pycache__/
+*.py[cod]
+*.egg-info/
+.eggs/
+build/
+dist/
+.venv/
+venv/
+.pytest_cache/
+.ruff_cache/
+.coverage
+htmlcov/
+
+# OS / Editor files
+.DS_Store
+Thumbs.db
+.vscode/
+.idea/

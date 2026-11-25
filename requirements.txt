@@ -1,0 +1,5 @@
+# Core pipeline runs on Python 3.11+ standard library with zero mandatory dependencies.
+# Install optional integrations below for .env auto-loading and live Google Sheets sync:
+python-dotenv>=1.0.1
+gspread>=6.1.2
+google-auth>=2.35.0

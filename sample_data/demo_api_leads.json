@@ -1,0 +1,41 @@
+[
+  {
+    "name": "Bright Smile Dental",
+    "owner": "Dr. Sarah Lin",
+    "website": "https://brightsmile.example.com",
+    "phone": "+1-512-555-0101",
+    "email": "hello@brightsmile.example.com",
+    "rating": 4.8,
+    "reviews": 142,
+    "map_link": "https://www.openstreetmap.org/?mlat=30.2672&mlon=-97.7431",
+    "city": "Austin",
+    "notes": "Duplicate test - should be skipped automatically",
+    "outreach": "2026-11-18"
+  },
+  {
+    "name": "Apex Family Dentistry",
+    "owner": "Dr. Omar Khan",
+    "website": "https://apexdental.example.com",
+    "phone": "+1-512-555-0144",
+    "email": "contact@apexdental.example.com",
+    "rating": 4.9,
+    "reviews": 215,
+    "map_link": "https://www.openstreetmap.org/?mlat=30.2850&mlon=-97.7350",
+    "city": "Austin",
+    "notes": "Source: Demo (dentist)",
+    "outreach": "2026-11-18"
+  },
+  {
+    "name": "Oakwood Wellness Clinic",
+    "owner": "",
+    "website": "https://oakwoodclinic.example.com",
+    "phone": "+1-512-555-0199",
+    "email": "info@oakwoodclinic.example.com",
+    "rating": 4.7,
+    "reviews": 64,
+    "map_link": "https://www.openstreetmap.org/?mlat=30.2990&mlon=-97.7410",
+    "city": "Austin",
+    "notes": "Source: Demo (dentist) - no outreach date yet",
+    "outreach": ""
+  }
+]

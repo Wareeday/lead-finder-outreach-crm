@@ -1,0 +1,266 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <title>Lead Finder &amp; Outreach CRM</title>
+  <link rel="stylesheet" href="/styles.css" />
+</head>
+<body>
+  <div class="app-shell">
+    <header class="topbar">
+      <div class="brand">
+        <div class="brand-badge">LC</div>
+        <div>
+          <h1>Lead Finder &amp; Outreach CRM</h1>
+          <p class="subtitle">Discovery, Website Enrichment, Scoring &amp; Multi-Step Follow-Up Console</p>
+        </div>
+      </div>
+      <div class="topbar-actions">
+        <a class="btn btn-ghost" href="/api/export/csv?kind=master">Export CSV</a>
+        <a class="btn btn-ghost" href="/api/export/csv?kind=queue">Export Queue</a>
+        <button class="btn btn-secondary" id="open-add-lead">+ Add Lead</button>
+        <button class="btn btn-primary" id="open-run-modal">Run Pipeline</button>
+      </div>
+    </header>
+
+    <section class="kpi-grid" id="kpi-grid">
+      <article class="kpi-card">
+        <span class="kpi-label">Total Leads</span>
+        <strong class="kpi-value" id="kpi-total">0</strong>
+        <span class="kpi-meta" id="kpi-avg-score">Avg score: 0</span>
+      </article>
+      <article class="kpi-card">
+        <span class="kpi-label">Grade A Leads</span>
+        <strong class="kpi-value accent-green" id="kpi-grade-a">0</strong>
+        <span class="kpi-meta" id="kpi-grades-meta">B: 0 · C: 0 · D: 0</span>
+      </article>
+      <article class="kpi-card">
+        <span class="kpi-label">Email Coverage</span>
+        <strong class="kpi-value" id="kpi-email-cov">0%</strong>
+        <span class="kpi-meta" id="kpi-email-count">0 reachable emails</span>
+      </article>
+      <article class="kpi-card">
+        <span class="kpi-label">Follow-Ups Due</span>
+        <strong class="kpi-value accent-amber" id="kpi-due">0</strong>
+        <span class="kpi-meta">Today + overdue queue</span>
+      </article>
+      <article class="kpi-card">
+        <span class="kpi-label">Reply Rate</span>
+        <strong class="kpi-value accent-blue" id="kpi-reply-rate">0%</strong>
+        <span class="kpi-meta" id="kpi-reply-meta">0 positive / 0 contacted</span>
+      </article>
+    </section>
+
+    <nav class="tabs">
+      <button class="tab active" data-tab="leads">CRM Pipeline</button>
+      <button class="tab" data-tab="queue">Daily Action Queue</button>
+      <button class="tab" data-tab="runs">Run History</button>
+    </nav>
+
+    <main>
+      <section class="panel active" id="tab-leads">
+        <div class="toolbar">
+          <input type="search" id="filter-search" placeholder="Search business, owner, email, city..." />
+          <select id="filter-status">
+            <option value="">All Statuses</option>
+            <option value="new">New</option>
+            <option value="enriched">Enriched</option>
+            <option value="contacted">Contacted</option>
+            <option value="replied">Replied</option>
+            <option value="booked">Booked</option>
+            <option value="won">Won</option>
+            <option value="lost">Lost</option>
+            <option value="unsubscribed">Unsubscribed</option>
+          </select>
+          <select id="filter-grade">
+            <option value="">All Grades</option>
+            <option value="A">Grade A</option>
+            <option value="B">Grade B</option>
+            <option value="C">Grade C</option>
+            <option value="D">Grade D</option>
+          </select>
+          <button class="btn btn-ghost" id="refresh-btn">Refresh</button>
+        </div>
+
+        <div class="table-wrap">
+          <table>
+            <thead>
+              <tr>
+                <th>Business</th>
+                <th>City</th>
+                <th>Grade / Score</th>
+                <th>Contact</th>
+                <th>Status</th>
+                <th>Outreach</th>
+                <th>Recommended Angle</th>
+                <th>Actions</th>
+              </tr>
+            </thead>
+            <tbody id="leads-tbody"></tbody>
+          </table>
+        </div>
+      </section>
+
+      <section class="panel" id="tab-queue">
+        <div class="toolbar">
+          <label class="checkbox-inline">
+            <input type="checkbox" id="queue-include-initial" />
+            Include uncontacted leads (initial stage)
+          </label>
+          <button class="btn btn-ghost" id="refresh-queue-btn">Refresh Queue</button>
+        </div>
+        <div class="table-wrap">
+          <table>
+            <thead>
+              <tr>
+                <th>Stage</th>
+                <th>Due Date</th>
+                <th>Business</th>
+                <th>Score</th>
+                <th>Email</th>
+                <th>Outreach Angle</th>
+                <th>Actions</th>
+              </tr>
+            </thead>
+            <tbody id="queue-tbody"></tbody>
+          </table>
+        </div>
+      </section>
+
+      <section class="panel" id="tab-runs">
+        <div class="table-wrap">
+          <table>
+            <thead>
+              <tr>
+                <th>Run ID</th>
+                <th>Mode</th>
+                <th>Target</th>
+                <th>Fetched</th>
+                <th>Added</th>
+                <th>Skipped</th>
+                <th>Queued</th>
+                <th>Drafts</th>
+                <th>Duration</th>
+                <th>Status</th>
+              </tr>
+            </thead>
+            <tbody id="runs-tbody"></tbody>
+          </table>
+        </div>
+      </section>
+    </main>
+  </div>
+
+  <!-- Lead Detail Drawer -->
+  <aside class="drawer hidden" id="lead-drawer">
+    <div class="drawer-header">
+      <div>
+        <h2 id="drawer-title">Lead Detail</h2>
+        <p class="subtitle" id="drawer-subtitle"></p>
+      </div>
+      <button class="btn btn-ghost" id="close-drawer">Close</button>
+    </div>
+    <div class="drawer-body" id="drawer-body"></div>
+  </aside>
+
+  <!-- Run Pipeline Modal -->
+  <div class="modal-backdrop hidden" id="run-modal">
+    <div class="modal">
+      <div class="modal-header">
+        <h2>Run Lead Pipeline</h2>
+        <button class="btn btn-ghost" id="close-run-modal">Close</button>
+      </div>
+      <form id="run-form" class="form-grid">
+        <label>Source Mode
+          <select name="mode">
+            <option value="demo">Demo (Offline Sample)</option>
+            <option value="osm">OpenStreetMap Overpass (Free Live)</option>
+            <option value="google">Google Places API (Requires Key)</option>
+          </select>
+        </label>
+        <label>Target City
+          <input type="text" name="city" value="Austin" required />
+        </label>
+        <label>Business Niche
+          <input type="text" name="niche" value="dentist" required />
+        </label>
+        <label>Max Leads
+          <input type="number" name="limit" value="15" min="1" max="100" required />
+        </label>
+        <label>Queue Reference Date
+          <input type="date" name="date" id="run-date-input" />
+        </label>
+        <label class="checkbox-inline">
+          <input type="checkbox" name="enrich" />
+          Enrich websites (emails, social &amp; booking signals)
+        </label>
+        <label class="checkbox-inline">
+          <input type="checkbox" name="draft_emails" checked />
+          Generate outreach email drafts
+        </label>
+        <div class="modal-actions">
+          <button type="submit" class="btn btn-primary" id="run-submit-btn">Execute Pipeline</button>
+        </div>
+      </form>
+    </div>
+  </div>
+
+  <!-- Add Lead Modal -->
+  <div class="modal-backdrop hidden" id="add-lead-modal">
+    <div class="modal">
+      <div class="modal-header">
+        <h2>Add Lead Manually</h2>
+        <button class="btn btn-ghost" id="close-add-modal">Close</button>
+      </div>
+      <form id="add-lead-form" class="form-grid">
+        <label>Business Name *
+          <input type="text" name="business_name" required />
+        </label>
+        <label>Owner / Contact Name
+          <input type="text" name="owner_name" />
+        </label>
+        <label>Email
+          <input type="email" name="email" />
+        </label>
+        <label>Phone
+          <input type="text" name="phone" />
+        </label>
+        <label>Website
+          <input type="url" name="website" placeholder="https://..." />
+        </label>
+        <label>City
+          <input type="text" name="city" value="Austin" />
+        </label>
+        <label>Notes
+          <textarea name="notes" rows="2"></textarea>
+        </label>
+        <div class="modal-actions">
+          <button type="submit" class="btn btn-primary">Save Lead</button>
+        </div>
+      </form>
+    </div>
+  </div>
+
+  <!-- Email Preview Modal -->
+  <div class="modal-backdrop hidden" id="email-modal">
+    <div class="modal modal-wide">
+      <div class="modal-header">
+        <h2 id="email-modal-title">Email Draft Preview</h2>
+        <button class="btn btn-ghost" id="close-email-modal">Close</button>
+      </div>
+      <div class="email-preview">
+        <div class="email-meta"><strong>To:</strong> <span id="preview-to"></span></div>
+        <div class="email-meta"><strong>Subject:</strong> <span id="preview-subject"></span></div>
+        <pre id="preview-body"></pre>
+        <div class="modal-actions">
+          <button class="btn btn-secondary" id="copy-email-btn">Copy Draft</button>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <div class="toast hidden" id="toast"></div>
+  <script src="/app.js"></script>
+</body>
+</html>
